@@ -22,20 +22,33 @@
             return $val.call($input);
         }
         
+        function placeholderValue($input) {
+            return $input.attr(placeholderAttr) + "\u00A0\u00A0";
+        }
+    	
+		function defer(fn) {
+            // move function to the end of event processing queue
+            // to avoid conflicting with other plug-ins.
+            setTimeout(fn, 0);
+		}
+        
         function onFocus() {
-            if (this.hasClass(placeholderClass)) {
-                this.removeClass(placeholderClass).val('');
-            }
+            var $this = $(this);
+            $this.removeClass(placeholderClass);
+			defer(function() {
+                if (val($this) === placeholderValue($this)) {
+                    $this.val('');
+                }
+            });
         }
         
         function onBlur() {
-            // move function to the end of event processing queue
-            // to avoid conflicting with other plug-ins.
-            setTimeout(function() {
-                if ($.trim(val(this)) === "") {
-                    this.addClass(placeholderClass).val(this.attr(placeholderAttr));
+            var $this = $(this);
+            defer(function() {
+                if ($.trim(val($this)) === "") {
+                    $this.addClass(placeholderClass).val(placeholderValue($this));
                 }
-            }, 0);
+            });
         }
 
         this.each(function() {
