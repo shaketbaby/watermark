@@ -1,0 +1,33 @@
+<html>
+<head>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.watermark.js"></script>
+
+    <style type="text/css">
+        .placeholder {
+            color: #CCC;
+        }
+    </style>
+
+    <script type="text/javascript">
+        //<![CDATA[    
+        $(document).ready(function () {
+		
+			// add placeholder
+            $.placeholder();
+			
+			// set focus to the input
+            $('#name').focus();
+        });
+        // ]]>
+    </script>
+</head>
+<body>
+
+    <form>
+        First name:
+        <input type="text" placeholder="First name" id="name"></input>
+    </form>
+
+</body>
+</html>
