@@ -23,7 +23,7 @@
         }
         
         function placeholderValue($input) {
-            return $input.attr(placeholderAttr) + "\u00A0\u00A0";
+            return $input.attr(placeholderAttr);
         }
     	
 		function defer(fn) {
@@ -32,27 +32,40 @@
             setTimeout(fn, 0);
 		}
         
-        function onFocus() {
+        function onKeyPress() {
             var $this = $(this);
             $this.removeClass(placeholderClass);
-			defer(function() {
-                if (val($this) === placeholderValue($this)) {
-                    $this.val('');
+            defer(function () {
+                if (val($this).indexOf(placeholderValue($this)) >= 0) {
+                    $this.val(val($this).replace(placeholderValue($this), ""));
                 }
             });
         }
         
+        function onFocus() {
+            var $this = $(this);
+            defer(function () { 
+                if (val($this) === placeholderValue($this)) {
+                    $this.selectRange(0, 0);
+                }
+            });
+        }
+
         function onBlur() {
             var $this = $(this);
             defer(function() {
-                if ($.trim(val($this)) === "") {
+                if ($.trim(val($this)) === "" || val($this) === placeholderValue($this)) {
                     $this.addClass(placeholderClass).val(placeholderValue($this));
                 }
             });
         }
 
         this.each(function() {
-            $(this).focusin(onFocus).focusout(onBlur).focusout();
+            $(this).focusin(onFocus)
+				   .click(onFocus)
+				   .keypress(onKeyPress)
+				   .focusout(onBlur)
+				   .focusout();
         });
 
         $.fn.val = function() {
@@ -60,6 +73,21 @@
                 return "";
             }
             return $val.apply(this, arguments);
+        };
+
+        $.fn.selectRange = function (start, end) {
+            return this.each(function () {
+                if (this.setSelectionRange) {
+                    this.focus();
+                    this.setSelectionRange(start, end);
+                } else if (this.createTextRange) {
+                    var range = this.createTextRange();
+                    range.collapse(true);
+                    range.moveEnd('character', end);
+                    range.moveStart('character', start);
+                    range.select();
+                }
+            });
         };
 
         $("form").submit(function() {
